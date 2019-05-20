@@ -19,7 +19,7 @@ def db():
 
 	#connect with database
 	con = MySQLdb.connect('hostname', 'user', 'password', 'dn_name');
-	#con = MySQLdb.connect('deviot.cvxdamlpotcj.eu-west-1.rds.amazonaws.com', 'mcdermg', 'Password7636', 'iot_db');
+	#con = MySQLdb.connect('deviot.cvxdamlpotcj.eu-west-1.rds.amazonaws.com', 'mcdermg', '<password>', 'iot_db');
 
 	with con:
 		cur = con.cursor()

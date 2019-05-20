@@ -13,7 +13,7 @@ random_number2 = random.randint(500, 999)
 def sendmail():
     to = 'mcdermott.gearoid@gmail.com'
     gmail_user = 'mcdermg@tcd.ie'
-    gmail_pwd = 'Timeclock7636'
+    gmail_pwd = '<password>'
     smtpserver = smtplib.SMTP("smtp.gmail.com",587)
     smtpserver.ehlo()
     smtpserver.starttls()
