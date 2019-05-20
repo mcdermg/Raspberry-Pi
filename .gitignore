@@ -1,0 +1,5 @@
+#  Pyenv
+.python-version
+
+# zip files
+*.zip
