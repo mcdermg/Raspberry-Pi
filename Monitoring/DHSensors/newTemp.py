@@ -1,36 +1,74 @@
 #!/usr/bin/python
 
+#Temperature reading programme by Gary Mc Dermott 20190520
+
+#sys library for exiting if no reading
 import sys
+#Adafruit library for getting sensor readings
 import Adafruit_DHT
+#JSON library for sending data
 import json
+#Time library for timestamp
 import time
+import datetime
+#urlib library for sending post to endpoint
+import urllib2
+#decimal library for lamda float issue
+from decimal import Decimal
+#Socket ibrary for getting hostname
+import socket
 
-try:
-    # For Python 3.0 and later
-    from urllib.request import urlopen
-except ImportError:
-    # Fall back to Python 2's urllib2
-    from urllib2 import urlopen
+#TODO REMOVE - for testing creting random ids
+import random
 
-humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.AM2302, 2)
+
+#Not required now but may beed to adapt for Python 3.
+#TODO Will need to add toggle for 2 functions one is pyhton 2 other is 3 call depending on toggle
+#try:
+#    # For Python 3.0 and later
+#    from urllib.request import urlopen
+#except ImportError:
+#    # Fall back to Python 2's urllib2
+#    from urllib2 import urlopen
+
+#Declare the pins that the sensor is attached to on the Pi
+humidity, temperature = Adafruit_DHT.read_retry(11, 4)
+
+#get hostname
+host = socket.gethostname()
+
+#Handle if there is an issue getting readings
 if humidity is not None and temperature is not None:
-    timestamp = int(time.time())
+    #declare timestamp & make it str for dynamo
+    timestamp = str(datetime.datetime.now())
+    #make temp and humidity ok for DynamoDB
+    h = str(Decimal(humidity))
+    t = str(Decimal(temperature))
 
+    #TODO remove for testing
+    cid = str(Decimal(random.randint(1, 50)))
+
+    #JSON data to be sent
     data = {
-        "id":None,
-        "tenant":"test",
-        "home":"main",
-        "room":"living room",
+        "CUSTOMER_ID":cid,
+        "tenant":host,
+        "home":"Amenabar",
+        "room":"Study",
         "timstamp":timestamp,
-        "temperature":temperature,
-        "humidity":humidity
+        "temperature":t,
+        "humidity":h
     }
 
-    req = urllib2.Request('https://api-gw-url.aws-region.amazonaws.com/production/ClimateMonitor')
+    #set the endpoint
+    req = urllib2.Request('https://oen28a79ij.execute-api.eu-west-1.amazonaws.com/dev/monitoring')
+    #Add header to explicitly stat json for POST
     req.add_header('Content-Type', 'application/json')
-    req.add_header('x-api-key', 'your-key')
+    #req.add_header('x-api-key', 'your-key')
 
     response = urllib2.urlopen(req, json.dumps(data))
+    #for debugging #TODO remove
 else:
+    #Handle no readings
+    #TODO add this to logfile with timestamp
     print('Failed to get reading. Try again!')
     sys.exit(1)
